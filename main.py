@@ -23,25 +23,68 @@ limiters = ['{', '}', ';', '[', ']', '=', '<>', '<', '<=', '>', '>=',
 digits = '0123456789'
 letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
 identifiers = []
+states = ['S', 'ID', 'NM', 'ADD', 'END']
+state = 'S'
 
-my_code = input()
-id = ''
+symbol = ' '
+numbers = []
+word = ''
 outputs = []
-for i in range(len(my_code)):
-    a = my_code[i]
-    if a != ' ':
-        id += a
-        if id in service_words:
-            outputs.append([1, service_words.index(id)+1])
-            id = ''
-        elif id in limiters:
-            outputs.append([2, limiters.index(id)+1])
-            id = ''
-    elif id != '':
-        if id not in identifiers:
-            identifiers.append(id)
-        outputs.append([4, identifiers.index(id)+1])
-        id = ''
 
+f = open('1.txt', 'r')
+
+while state != 'END':
+    match(state):
+        case 'S':
+            while symbol == ' ' or symbol == '\t' or symbol == '\n':
+                    if symbol == '}':
+                        print('')
+                    symbol = f.read(1)
+            if symbol == '':
+                state = 'END'
+            elif symbol in letters or symbol == '_':
+                state = 'ID'
+            elif symbol in digits:
+                state = 'NM'
+            else:
+                state = 'LIM'
+
+        case 'ID':
+            while symbol in letters or symbol in digits or symbol =='_':
+                word += symbol
+                symbol = f.read(1)
+            state = 'ADD'
+
+        case 'NM':
+            while symbol in digits or symbol == '.':
+                word += symbol
+                symbol = f.read(1)
+            state = 'ADD'
+
+        case 'LIM':
+            while symbol != '' and symbol != ' ':
+                word += symbol
+                symbol = f.read(1)
+            state = 'ADD'
+
+        case 'ADD':
+            if word in service_words:
+                outputs.append([1, service_words.index(word) + 1])
+            elif word in limiters:
+                outputs.append([2, limiters.index(word) + 1])
+            elif word != '':
+                if word[0] in letters:
+                    if word not in identifiers:
+                        identifiers.append(word)
+                    outputs.append([4, identifiers.index(word) + 1])
+                else:
+                    if word not in numbers:
+                        numbers.append(word)
+                    outputs.append([3, numbers.index(word) + 1])
+            else:
+                state = 'ERR'
+            word = ''
+            state = 'S'
+f.close()
 print(outputs)
 
