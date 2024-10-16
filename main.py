@@ -44,7 +44,7 @@ def checkNum(num):
         for n in num[:-1:]:
             if n not in '01234567':
                 return True
-    elif (num[-1] in digits or num[-1] in 'Dd') and num.count('E') == 0:
+    elif (num[-1] in digits or num[-1] in 'Dd') and num.count('.') == 0:
         for n in num[:-1:]:
             if n not in digits:
                 return True
@@ -53,16 +53,16 @@ def checkNum(num):
             if n not in digits and n not in 'ABCDEFabcdef':
                 return True
     else:
-        check = re.compile('\d+([Ee])[-+]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][-+]?\d+)?')
+        check = re.compile('((\d+[eE][+-]?\d*)|\d*)\.\d+([eE][+-]?\d*)?')
         if not re.match(check, num):
             return True
     return False
 
 
 service_words = ['or', 'and', 'not', 'while', 'read', 'for', 'to', 'do',
-                 'int', 'float', 'bool', 'write', 'if', 'then']
+                 'int', 'float', 'bool', 'write', 'if', 'then', 'as']
 limiters = ['{', '}', ';', '[', ']', '=', '<>', '<', '<=', '>', '>=',
-            '+', '-', '*', '/', '/*', '*/', '(', ')']
+            '+', '-', '*', '/', '/*', '*/', '(', ')', ',']
 digits = '0123456789'
 letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
 identifiers = []
@@ -78,7 +78,7 @@ errorMessage = ''
 f = open('2.txt', 'r')
 
 while state != 'END':
-    match(state):
+    match state:
         case 'S':
             while symbol == ' ' or symbol == '\t' or symbol == '\n':
                 symbol = f.read(1)
@@ -86,7 +86,7 @@ while state != 'END':
                 state = 'END'
             elif symbol in letters or symbol == '_':
                 state = 'ID'
-            elif symbol in digits:
+            elif symbol in digits or symbol == '.':
                 state = 'NM'
             else:
                 state = 'LIM'

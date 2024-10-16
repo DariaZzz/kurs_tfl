@@ -1,1 +1,1 @@
-3E+4.1
+{ float num as 3E+4.1 ; if num > 1 then write .1e+10 , num ; }

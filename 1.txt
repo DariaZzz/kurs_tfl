@@ -1,1 +1,1 @@
-{ int abc { 4 } ; while abc > 0 do abc = abc - 1 ; }
+{ int abc as 4  ; while abc > 0 do abc as abc - 1 ; }
