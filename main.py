@@ -40,11 +40,11 @@ def checkNum(num):
         for n in num[:-1:]:
             if n not in '01':
                 return True
-    elif num[-1] in 'Bb':
+    elif num[-1] in 'Oo':
         for n in num[:-1:]:
             if n not in '01234567':
                 return True
-    elif (num[-1] in digits or num[-1] in 'Dd') and num.count('.') == 0:
+    elif (num[-1] in digits or num[-1] in 'Dd') and num.count('.') == 0 and num.count('E') == 0 and num.count('e') == 0:
         for n in num[:-1:]:
             if n not in digits:
                 return True
@@ -53,8 +53,11 @@ def checkNum(num):
             if n not in digits and n not in 'ABCDEFabcdef':
                 return True
     else:
-        check = re.compile('((\d+[eE][+-]?\d*)|\d*)\.\d+([eE][+-]?\d*)?')
-        if not re.match(check, num):
+        if word.count('.') == 0:
+            check = re.compile('\d+([Ee][+-]?\d+)?')
+        else:
+            check = re.compile('\d*\.\d+([Ee][+-]?\d+)?')
+        if not re.match(check, word):
             return True
     return False
 
@@ -95,15 +98,20 @@ while state != 'END':
             while symbol in letters or symbol in digits or symbol =='_':
                 word += symbol
                 symbol = f.read(1)
-            if symbol != ' ':
+            if symbol != ' ' and symbol != '' and symbol != '\n' and symbol != '\t':
+                while symbol != ' ' and symbol != '' and symbol != '\n' and symbol != '\t':
+                    word += symbol
+                    symbol = f.read(1)
                 state = 'ERR'
-            state = 'ADD'
+                errorMessage = f'Ошибка в лексеме {word}'
+            else:
+                state = 'ADD'
 
         case 'NM':
             while symbol != '' and symbol != ' ' and (symbol in digits or symbol in 'ABCDEFOabcdefo+-.'):
                 word += symbol
                 symbol = f.read(1)
-            if symbol == ' ' or symbol == '':
+            if symbol == ' ' or symbol == '' or symbol == '\n' or symbol == '\t':
                 if checkNum(word):
                     state = 'ERR'
                     errorMessage = f'Неверный формат числа {word}. Повторите попытку.'
@@ -114,7 +122,7 @@ while state != 'END':
                 errorMessage = f'Неверный формат числа {word}. Проверьте символы и повторите попытку.'
 
         case 'LIM':
-            while symbol != '' and symbol != ' ':
+            while symbol != ' ' and symbol != '' and symbol != '\n' and symbol != '\t':
                 word += symbol
                 symbol = f.read(1)
             state = 'ADD'
@@ -129,18 +137,22 @@ while state != 'END':
                     if word not in identifiers:
                         identifiers.append(word)
                     outputs.append([4, identifiers.index(word) + 1])
-                else:
+                elif word[0] in digits or word[0] == '.':
                     if word not in numbers:
                         numbers.append(word)
                     outputs.append([3, numbers.index(word) + 1])
+                else:
+                    state = 'ERR'
+                    errorMessage = f'Ошибка в синтаксисе лексемы {word}'
             else:
                 state = 'ERR'
-                errorMessage = f'Слово почему-то пустое, повторите попытку :('
-            word = ''
-            state = 'S'
-
+                errorMessage = f'Слово пустое....{symbol}'
+            if state != 'ERR':
+                word = ''
+                state = 'S'
         case 'ERR':
             print(errorMessage)
+            state = 'END'
             exit(1)
 f.close()
 print(outputs)
