@@ -1,1 +1,7 @@
-{ int abc as 4  ; while abc > 0 do abc as abc - 1 ; }
+{ float a as 5E-5 ;
+    bool check ;
+    if a <= 10.0 then
+        check as true
+    else
+       check as false ;
+}

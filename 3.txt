@@ -1,0 +1,2 @@
+{ float num_qwe := .01
+if num > 1 then write ( true ) ; }
