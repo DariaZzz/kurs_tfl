@@ -1,7 +1,8 @@
 { float a as 5E-5 ;
-    bool check ;
+            bool check ;
     if a <= 10.0 then
         check as true
+
     else
        check as false ;
 }

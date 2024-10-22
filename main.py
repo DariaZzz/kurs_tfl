@@ -90,7 +90,7 @@ def checkNum(num):
 
 
 service_words = ['or', 'and', 'not', 'while', 'read', 'for', 'to', 'do',
-                 'int', 'float', 'bool', 'write', 'if', 'then', 'as']
+                 'int', 'float', 'bool', 'write', 'if', 'then', 'else', 'as', 'true', 'false']
 limiters = ['{', '}', ';', '[', ']', '=', '<>', '<', '<=', '>', '>=',
             '+', '-', '*', '/', '/*', '*/', '(', ')', ',']
 digits = '0123456789'
@@ -105,7 +105,7 @@ word = ''
 outputs = []
 errorMessage = ''
 
-f = open('5.txt', 'r')
+f = open('7.txt', 'r')
 
 while state != 'END':
     match state:
@@ -145,6 +145,9 @@ while state != 'END':
                 else:
                     state = 'ADD'
             else:
+                while not (symbol == ' ' or symbol == '' or symbol == '\n' or symbol == '\t'):
+                    word += symbol
+                    symbol = f.read(1)
                 state = 'ERR'
                 errorMessage = f'Неверный формат числа "{word}". Проверьте символы и повторите попытку.'
 
@@ -181,6 +184,9 @@ while state != 'END':
             print(errorMessage)
             state = 'END'
             exit(1)
+
+
 f.close()
 print(outputs)
+
 
