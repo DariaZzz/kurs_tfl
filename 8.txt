@@ -1,0 +1,2 @@
+{ bool a as true ;
+there is a comment */ }
