@@ -74,17 +74,21 @@ import re
 
 class Lexer:
     service_words = ['or', 'and', 'not', 'while', 'read', 'for', 'to', 'do',
-                     'int', 'float', 'bool', 'write', 'if', 'then', 'else', 'as', 'true', 'false']
+                     'int', 'float', 'bool', 'write', 'if', 'then', 'else', 'as', 'true', 'false'] #1
     limiters = ['{', '}', ';', '[', ']', '=', '<>', '<', '<=', '>', '>=',
-                '+', '-', '*', '/', '(', ')', ',']
+                '+', '-', '*', '/', '(', ')', ','] #2
     digits = '0123456789'
     letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
-    identifiers = []
+    identifiers = [] #3
     states = ['S', 'ID', 'NM', 'ADD', 'END', 'ERR', 'COMM']
     state = 'S'
 
     symbol = ' '
-    numbers = []
+    numbers_bin = [] #4
+    numbers_oct = [] #5
+    numbers_dec = [] #6
+    numbers_hex = [] #7
+    numbers_real = [] #8
     word = ''
     outputs = []
     errorMessage = ''
@@ -186,18 +190,36 @@ class Lexer:
 
                 case 'ADD':
                     if self.word in self.service_words:
-                        self.outputs.append([1, self.service_words.index(self.word) + 1])
+                        self.outputs.append([1, self.service_words.index(self.word)])
                     elif self.word in self.limiters:
-                        self.outputs.append([2, self.limiters.index(self.word) + 1])
+                        self.outputs.append([2, self.limiters.index(self.word)])
                     elif self.word != '':
                         if self.word[0] in self.letters:
                             if self.word not in self.identifiers:
                                 self.identifiers.append(self.word)
-                            self.outputs.append([4, self.identifiers.index(self.word) + 1])
+                            self.outputs.append([3, self.identifiers.index(self.word)])
                         elif self.word[0] in self.digits or self.word[0] == '.':
-                            if self.word not in self.numbers:
-                                self.numbers.append(self.word)
-                            self.outputs.append([3, self.numbers.index(self.word) + 1])
+                            if self.word[-1] in 'Bb':
+                                if self.word not in self.numbers_bin:
+                                    self.numbers_bin.append(self.word)
+                                self.outputs.append([4, self.numbers_bin.index(self.word)])
+                            elif self.word[-1] in 'Oo':
+                                if self.word not in self.numbers_oct:
+                                    self.numbers_oct.append(self.word)
+                                self.outputs.append([5, self.numbers_oct.index(self.word)])
+                            elif self.word[-1] in 'Hh':
+                                if self.word not in self.numbers_hex:
+                                    self.numbers_hex.append(self.word)
+                                self.outputs.append([7, self.numbers_hex.index(self.word)])
+                            elif (self.word[-1] in self.digits or self.word[-1] in 'Dd') and self.word.count('.') == 0\
+                                  and self.word.count('E') == 0 and self.word.count('e') == 0:
+                                if self.word not in self.numbers_dec:
+                                    self.numbers_dec.append(self.word)
+                                self.outputs.append([6, self.numbers_dec.index(self.word)])
+                            else:
+                                if self.word not in self.numbers_real:
+                                    self.numbers_real.append(self.word)
+                                self.outputs.append([8, self.numbers_real.index(self.word)])
                         else:
                             self.state = 'ERR'
                             self.errorMessage = f'Ошибка в лексеме "{self.word}"'
@@ -212,7 +234,7 @@ class Lexer:
                     self.state = 'END'
                     exit(1)
 
-f = open('7.txt', 'r')
+f = open('8.txt', 'r')
 lexer = Lexer(f)
 print(lexer.outputs)
 # print(lexer.errorMessage)
