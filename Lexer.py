@@ -4,7 +4,7 @@ class Lexer:
     service_words = ['or', 'and', 'not', 'while', 'read', 'for', 'to', 'do',
                      'int', 'float', 'bool', 'write', 'if', 'then', 'else', 'as', 'true', 'false'] #1
     limiters = ['{', '}', ';', '[', ']', '=', '<>', '<', '<=', '>', '>=',
-                '+', '-', '*', '/', '(', ')', ','] #2
+                '+', '-', '*', '/', '(', ')', ',', ':', '\n'] #2
     digits = '0123456789'
     letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
     identifiers = [] #3
