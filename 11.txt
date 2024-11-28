@@ -1,0 +1,2 @@
+{ float a ; a as 11B ; [ if a <= 101B then check as true
+asdfgh dfghjkl dfghjkl check as false ] ;

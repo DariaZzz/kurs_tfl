@@ -4,7 +4,7 @@ class Lexer:
     service_words = ['or', 'and', 'not', 'while', 'read', 'for', 'to', 'do',
                      'int', 'float', 'bool', 'write', 'if', 'then', 'else', 'as', 'true', 'false'] #1
     limiters = ['{', '}', ';', '[', ']', '=', '<>', '<', '<=', '>', '>=',
-                '+', '-', '*', '/', '(', ')', ',', ':', '\n'] #2
+                '+', '-', '*', '/', '(', ')', ',', ':'] #2
     digits = '0123456789'
     letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
     identifiers = [] #3
@@ -52,13 +52,11 @@ class Lexer:
     def __init__(self, f):
         self.run(f)
 
-
     def run(self, f):
         while self.state != 'END':
             match self.state:
                 case 'S':
-                    while self.symbol == ' ' or self.symbol == '\t' or self.symbol == '\n':
-                        self.symbol = f.read(1)
+                    self.symbol = f.read(1)
                     if self.symbol == '':
                         self.state = 'END'
                     elif self.symbol in self.letters:
@@ -67,8 +65,11 @@ class Lexer:
                         self.state = 'NM'
                     elif self.symbol == '/':
                         self.state = 'COMM'
-                    else:
+                    elif self.symbol in self.limiters:
                         self.state = 'LIM'
+                    elif self.symbol != ' ' and self.symbol != '\t' and self.symbol != '\n':
+                        self.errorMessage = f'Неизвестный символ "{self.symbol}"'
+                        self.state = 'ERR'
 
                 case 'ID':
                     while self.symbol in self.letters or self.symbol in self.digits or self.symbol == '_':
@@ -94,7 +95,7 @@ class Lexer:
                         else:
                             self.state = 'ADD'
                     else:
-                        while not (self.symbol == ' ' or self.symbol == '' or self.symbol == '\n' or self.symbol == '\t'):
+                        while self.symbol != ' ' and self.symbol != '' and self.symbol != '\n' and self.symbol != '\t':
                             self.word += self.symbol
                             self.symbol = f.read(1)
                         self.state = 'ERR'
@@ -110,7 +111,12 @@ class Lexer:
                     else:
                         self.word = ''
                         self.state = 'S'
+
                 case 'LIM':
+                    if self.symbol == '\n':
+                        self.word = self.symbol
+                        self.state = 'ADD'
+                        continue
                     while self.symbol != ' ' and self.symbol != '' and self.symbol != '\n' and self.symbol != '\t':
                         self.word += self.symbol
                         self.symbol = f.read(1)
@@ -126,19 +132,23 @@ class Lexer:
                             if self.word not in self.identifiers:
                                 self.identifiers.append(self.word)
                             self.outputs.append([3, self.identifiers.index(self.word)])
+
                         elif self.word[0] in self.digits or self.word[0] == '.':
                             if self.word[-1] in 'Bb':
                                 if self.word not in self.numbers_bin:
                                     self.numbers_bin.append(self.word)
                                 self.outputs.append([4, self.numbers_bin.index(self.word)])
+
                             elif self.word[-1] in 'Oo':
                                 if self.word not in self.numbers_oct:
                                     self.numbers_oct.append(self.word)
                                 self.outputs.append([5, self.numbers_oct.index(self.word)])
+
                             elif self.word[-1] in 'Hh':
                                 if self.word not in self.numbers_hex:
                                     self.numbers_hex.append(self.word)
                                 self.outputs.append([7, self.numbers_hex.index(self.word)])
+
                             elif (self.word[-1] in self.digits or self.word[-1] in 'Dd') and self.word.count('.') == 0\
                                   and self.word.count('E') == 0 and self.word.count('e') == 0:
                                 if self.word not in self.numbers_dec:
@@ -153,17 +163,15 @@ class Lexer:
                             self.errorMessage = f'Ошибка в лексеме "{self.word}"'
                     else:
                         self.state = 'ERR'
-                        self.errorMessage = f'Слово пустое....{self.symbol}'
+                        self.errorMessage = f'Слово пустое...{self.symbol}'
                     if self.state != 'ERR':
                         self.word = ''
                         self.state = 'S'
                 case 'ERR':
-                    print(self.errorMessage)
-                    self.state = 'END'
-                    exit(1)
+                    raise Exception(self.errorMessage)
 
-f = open('8.txt', 'r')
-lexer = Lexer(f)
-print(lexer.outputs)
+# f = open('10.txt', 'r')
+# lexer = Lexer(f)
+# print(lexer.outputs)
 # print(lexer.errorMessage)
-f.close()
+# f.close()

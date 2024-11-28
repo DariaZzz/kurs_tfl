@@ -1,0 +1,2 @@
+{ float a , j ; a as 11B ;
+ [ if a <= 101B then check as true else [ check as false : a as 3 : while a >= 0 do a as a - 1 ] ] ; }

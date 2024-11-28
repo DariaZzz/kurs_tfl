@@ -1,2 +1,1 @@
-{ float num_qwe as 3E+4
-if num > 1 then write ( 1E-5.1e+10 ) ; }
+{ float num_qwe ; num_qwe as 3E+4 ; if num_qwe > 1 then write ( 1E-5.1e+10 ) ; }
