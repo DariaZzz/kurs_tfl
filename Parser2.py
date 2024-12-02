@@ -1,6 +1,6 @@
 from pydoc import describe
 
-from Lexer import Lexer
+from Lexer2 import Lexer
 
 class Parser:
 
@@ -16,11 +16,25 @@ class Parser:
     lex_type = -1
     errorMessage = ''
     lexer = None
+    last_n = -1
 
     def __init__(self, f): # конструктор
         self.lexer = Lexer(f)
         self.run()
         print("OK!")
+
+    # def gl(self): # взять лексему
+    #     if self.lex_num < len(self.lexer.outputs):
+    #         self.lex = self.lexer.outputs[self.lex_num]
+    #         self.lex_value = self.lexer.outputs[self.lex_num][1]
+    #         self.lex_type = self.lexer.outputs[self.lex_num][0]
+    #         self.lex_num += 1
+    #         while self.get_lexema() == '\n':
+    #             self.gl()
+    #     else:
+    #         self.lex = []
+    #         self.lex_value = ''
+    #         self.lex_type = -1
 
     def gl(self): # взять лексему
         if self.lex_num < len(self.lexer.outputs):
@@ -28,10 +42,26 @@ class Parser:
             self.lex_value = self.lexer.outputs[self.lex_num][1]
             self.lex_type = self.lexer.outputs[self.lex_num][0]
             self.lex_num += 1
+            while self.get_lexema() == '\n':
+                self.last_n = self.lex_num
+                self.gl()
         else:
             self.lex = []
             self.lex_value = ''
             self.lex_type = -1
+
+    def skip_n(self):
+        while self.get_lexema() == '\n':
+            if self.lex_num < len(self.lexer.outputs):
+                self.lex = self.lexer.outputs[self.lex_num]
+                self.lex_value = self.lexer.outputs[self.lex_num][1]
+                self.lex_type = self.lexer.outputs[self.lex_num][0]
+                self.lex_num += 1
+            else:
+                self.lex = []
+                self.lex_value = ''
+                self.lex_type = -1
+
 
     def run(self):
         self.gl()
@@ -135,8 +165,9 @@ class Parser:
     # <составной>::= «[» <оператор> { ( : | перевод строки) <оператор> } «]»
     def MULTI_OP(self):
         self.OP()
-        while self.get_lexema() == ':':
-            self.gl()
+        while self.get_lexema() == ':' or self.last_n == self.lex_num - 1:
+            if self.get_lexema() == ':':
+                self.gl()
             self.OP()
 
         if self.get_lexema() != ']':
@@ -273,7 +304,6 @@ class Parser:
                 return self.lexer.numbers_hex[self.lex_value]
             case 8:
                 return self.lexer.numbers_real[self.lex_value]
-        return None
 
-f = open('13.txt', 'r')
+f = open('9.txt', 'r')
 parser = Parser(f)

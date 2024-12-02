@@ -1,1 +1,6 @@
-{ a as 4 + 5 ; }
+{ int a , b ; a as 4 + 5 ;
+ while a > 0 do
+ [ a as a - 1 :
+  b as b + 2 ]
+}
+

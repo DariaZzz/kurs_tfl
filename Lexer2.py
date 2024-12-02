@@ -5,7 +5,7 @@ class Lexer:
                      'int', 'float', 'bool', 'write', 'if', 'then', 'else', 'as',
                      'true', 'false'] #1
     limiters = ['{', '}', ';', '[', ']', '=', '<>', '<', '<=', '>', '>=',
-                '+', '-', '*', '/', '(', ')', ',', ':'] #2
+                '+', '-', '*', '/', '(', ')', ',', ':', '\n'] #2
     digits = '0123456789'
     letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
     identifiers = [] #3
@@ -69,7 +69,7 @@ class Lexer:
                         self.state = 'COMM'
                     elif self.symbol in self.limiters:
                         self.state = 'LIM'
-                    elif self.symbol != ' ' and self.symbol != '\t' and self.symbol != '\n':
+                    elif self.symbol != ' ' and self.symbol != '\t':
                         self.errorMessage = f'Неизвестный символ "{self.symbol}"'
                         self.state = 'ERR'
 
@@ -165,14 +165,18 @@ class Lexer:
                     else:
                         self.state = 'ERR'
                         self.errorMessage = f'Слово пустое...{self.symbol}'
-                    if self.state != 'ERR':
+
+                    if self.symbol == '\n' and self.word != '\n':
+                        self.word = self.symbol
+                        self.state = 'ADD'
+                    elif self.state != 'ERR':
                         self.word = ''
                         self.state = 'S'
                 case 'ERR':
                     raise Exception(self.errorMessage)
 
 #
-# f = open('5.txt', 'r')
+# f = open('1.txt', 'r')
 # lexer = Lexer(f)
 # print(lexer.outputs)
 #
