@@ -10,6 +10,7 @@ class Parser:
                      'as': 15, 'true': 16, 'false': 17}  # 1
     limiters = {'{': 0, '}': 1, ';': 2, '[': 3, ']': 4, '=': 5, '<>': 6, '<': 7, '<=': 8, '>': 9, '>=': 10,
                 '+': 11, '-': 12, '*': 13, '/': 14, '(': 15, ')': 16, ',': 17, ':': 18}  # 2
+
     lex_num = 0
     lex = []
     lex_value = ''
@@ -22,19 +23,6 @@ class Parser:
         self.lexer = Lexer(f)
         self.run()
         print("OK!")
-
-    # def gl(self): # взять лексему
-    #     if self.lex_num < len(self.lexer.outputs):
-    #         self.lex = self.lexer.outputs[self.lex_num]
-    #         self.lex_value = self.lexer.outputs[self.lex_num][1]
-    #         self.lex_type = self.lexer.outputs[self.lex_num][0]
-    #         self.lex_num += 1
-    #         while self.get_lexema() == '\n':
-    #             self.gl()
-    #     else:
-    #         self.lex = []
-    #         self.lex_value = ''
-    #         self.lex_type = -1
 
     def gl(self): # взять лексему
         if self.lex_num < len(self.lexer.outputs):
@@ -49,19 +37,6 @@ class Parser:
             self.lex = []
             self.lex_value = ''
             self.lex_type = -1
-
-    def skip_n(self):
-        while self.get_lexema() == '\n':
-            if self.lex_num < len(self.lexer.outputs):
-                self.lex = self.lexer.outputs[self.lex_num]
-                self.lex_value = self.lexer.outputs[self.lex_num][1]
-                self.lex_type = self.lexer.outputs[self.lex_num][0]
-                self.lex_num += 1
-            else:
-                self.lex = []
-                self.lex_value = ''
-                self.lex_type = -1
-
 
     def run(self):
         self.gl()
@@ -285,7 +260,6 @@ class Parser:
         else:
             raise SyntaxError(f'Ошибка в синтаксисе множителя "{self.get_lexema()}"')
 
-
     def get_lexema(self): # получить лексему по номеру
         match self.lex_type:
             case 1:
@@ -305,5 +279,5 @@ class Parser:
             case 8:
                 return self.lexer.numbers_real[self.lex_value]
 
-f = open('9.txt', 'r')
+f = open('14.txt', 'r')
 parser = Parser(f)

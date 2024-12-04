@@ -1,0 +1,1 @@
+{ int a ; a as 3 ; if ( a > 5 * 3 and a < 5 and a <> 3 or a = 6 ) then a as a - 1 ; }
